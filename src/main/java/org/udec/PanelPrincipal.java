@@ -16,9 +16,6 @@ public class PanelPrincipal extends JPanel {
         this.add(exp, BorderLayout.WEST);
         this.add(com, BorderLayout.EAST);
 
-
-
-
         this.setBackground(Color.black);
     }
 
@@ -27,5 +24,6 @@ public class PanelPrincipal extends JPanel {
         super.paintComponent(g);
         exp.paintComponent(g);
         com.paintComponent(g);
+
     }
 }
