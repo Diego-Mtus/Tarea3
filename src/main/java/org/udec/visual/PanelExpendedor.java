@@ -161,6 +161,14 @@ public class PanelExpendedor extends JPanel {
         this.panelComprador = panelComprador;
     }
 
+    public void recargarStock(int nuevaCantidad){
+        for(int i = 0; i < productos.length; i++){
+            stockDeCadaProducto[i] = nuevaCantidad;
+        }
+        this.expendedor = new Expendedor(nuevaCantidad);
+        repaint(-20,500,400,280);
+    }
+
     @Override
     protected void paintComponent(Graphics gr) {
         super.paintComponent(gr);

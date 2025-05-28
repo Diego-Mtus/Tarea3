@@ -7,7 +7,7 @@ import java.awt.*;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PanelComprador extends JPanel {
 
@@ -17,6 +17,7 @@ public class PanelComprador extends JPanel {
     private Producto ultimoProducctoComprado;
     private JButton botonSaldo;
     private Deposito<Moneda> depositoMonedasVuelto;
+    private JButton botonRecargarStock;
 
     public PanelComprador(PanelExpendedor panelExpendedor) {
         this.setPreferredSize(new Dimension(400, 900));
@@ -76,11 +77,22 @@ public class PanelComprador extends JPanel {
                 crearVentanaVuelto();
             }
         });
-
         this.add(new BotonUsarProducto(300,340));
 
-    }
+        // Boton de recargar stock de todos los productos.
+        botonRecargarStock = new JButton("Recargar stock");
+        botonRecargarStock.setPreferredSize(new Dimension(300, 30));
+        botonRecargarStock.setFocusable(false);
+        this.add(botonRecargarStock);
+        botonRecargarStock.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panelExpendedor.recargarStock(recargarStockNum());
+            }
+        });
 
+    }
+    
     public void actualizarBotonComprar() {
         if (panelExpendedor.getUltimoClickeado() == -1) {
             botonComprar.setText("Elige un producto a comprar");
@@ -91,6 +103,42 @@ public class PanelComprador extends JPanel {
         botonComprar.setEnabled(panelExpendedor.verStockActual(panelExpendedor.getUltimoClickeado()) > 0);
     }
 
+    private int recargarStockNum() {
+        JDialog ventana = new JDialog((JFrame) SwingUtilities.getWindowAncestor(PanelComprador.this), "Recargar stock", true);
+        ventana.setSize(300, 200);
+        ventana.setLayout(new BorderLayout());
+        ventana.setLocationRelativeTo(null);
+
+        JPanel panelCentral = new JPanel(new GridLayout(2, 2, 10, 10));
+
+        panelCentral.add(new JLabel("Ingrese cantidad:"));
+        JTextField inputCantidad = new JTextField();
+        panelCentral.add(inputCantidad);
+
+        ventana.add(panelCentral, BorderLayout.CENTER);
+
+        JButton btnAceptar = new JButton("Aceptar");
+        ventana.add(btnAceptar, BorderLayout.SOUTH);
+        AtomicInteger aux = new AtomicInteger();
+
+        btnAceptar.addActionListener(e -> {
+            try {
+                int cantidad = Integer.parseInt(inputCantidad.getText());
+                if (cantidad > 0) {
+                    ventana.dispose();
+                    aux.set(cantidad);
+                } else {
+                    JOptionPane.showMessageDialog(ventana, "Ingrese un número entero positivo.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(ventana, "Entrada no válida. Ingrese un número entero positivo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        ventana.setVisible(true);
+        return aux.get();
+    }
+    
     private void recibirVuelto(JDialog ventana){
         Moneda aux = depositoMonedasVuelto.get();
         while(aux != null){
@@ -103,10 +151,10 @@ public class PanelComprador extends JPanel {
 
     private void crearVentanaVuelto(){
         JDialog ventana = new JDialog((JFrame) SwingUtilities.getWindowAncestor(PanelComprador.this), "Vuelto", true);
-        ventana.setSize(500, 500);
         ventana.setLocationRelativeTo(null);
         ventana.setLayout(new GridLayout(10, 2));
         recibirVuelto(ventana);
+        ventana.pack();
         ventana.setVisible(true);
     }
 

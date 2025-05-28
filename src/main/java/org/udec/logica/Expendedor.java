@@ -18,6 +18,9 @@ public class Expendedor {
     /** Depositos para gestionar las monedas*/
     private Deposito<Moneda> depositoMonedas;
 
+    /** Contador para generar series distintas*/
+    static private int serieContador = 1;
+
 
     /** Constructor que crea los productos contenidos en cada depósito.
      * @param cantidad Cantidad de productos por cada depósito.
@@ -30,11 +33,12 @@ public class Expendedor {
         depositoSuper8 = new Deposito<Producto>();
         depositoMonedas = new Deposito<Moneda>();
         for(int i = 0; i < cantidad; i++){
-            depositoCocaCola.add(new CocaCola(100+i));
-            depositoSprite.add(new Sprite(200+i));
-            depositoFanta.add(new Fanta(300+i));
-            depositoSnickers.add(new Snickers(400+i));
-            depositoSuper8.add(new Super8(500+i));
+            depositoCocaCola.add(new CocaCola(100+serieContador));
+            depositoSprite.add(new Sprite(200+serieContador));
+            depositoFanta.add(new Fanta(300+serieContador));
+            depositoSnickers.add(new Snickers(400+serieContador));
+            depositoSuper8.add(new Super8(500+serieContador));
+            serieContador++;
         }
 
     }
