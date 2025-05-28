@@ -1,7 +1,9 @@
-package org.udec;
+package org.udec.visual;
 
 // Base de la implementación obtenido de
 // https://stackoverflow.com/questions/24034747/how-to-implement-mouselistener-on-a-particular-shape
+
+import org.udec.logica.ProductosEnum;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -11,6 +13,7 @@ import java.awt.geom.AffineTransform;
 
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,18 +29,24 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
     private final Shape figura;
     private boolean mouseEnFigura;
     private Area rectanguloArea;
-    int[][] esquinasRect;
-    int diametroCirculo = 6;
+    private int[][] esquinasRect;
+    private int diametroCirculo = 6;
+
+    // Variables de producto
+    private ProductosEnum producto;
+    private int stockActual;
+    private int precioActual;
 
     // Variables manejo imagen
     private Image imagen;
     private PanelExpendedor panelExpendedor;
+    private Image imagenNoStock;
 
 
     // Variables del texto
     private final String texto;
     private Font fuentePersonalizada;
-    private ProductosEnum producto;
+
 
     // Variables para sonido
     private boolean sonidoHoverYaReproducido = false;
@@ -62,7 +71,9 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
     public BotonRombo(int x, int y, int ancho, int alto, Image imagen, PanelExpendedor panelExpendedor, ProductosEnum producto) {
         this.panelExpendedor = panelExpendedor;
         this.imagen = imagen;
+        this.imagenNoStock = generarImagenNoStock(imagen);
         this.producto = producto;
+        this.precioActual = producto.getPrecio();
 
         this.setOpaque(false);
         // Crear un rectangulo rotado
@@ -76,6 +87,7 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
         this.rectanguloArea = new Area(figura);
         this.mouseEnFigura = false;
         this.colorTexto = colorHover;
+
 
 
         // Esquinas son para hacer circulos en las esquinas como si fueran perforaciones
@@ -210,9 +222,15 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
     @Override
     public void mouseClicked(MouseEvent e) {
         if (figura.contains(e.getPoint())) {
-            System.out.println("Figura clickeada");
+            System.out.println(producto.getNombre() + " clickeada");
             inicioTransicionColor();
             reproducirSonido(clipClick);
+            if (panelExpendedor != null) {
+                // todo: Aplicar esto pero con el boton de comprar del comprador.
+                panelExpendedor.setUltimoClickeado(producto.ordinal());
+                panelExpendedor.notificarBoton();
+
+            }
 
         }
     }
@@ -222,6 +240,36 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
         double[] coords = {x, y};
         transform.transform(coords, 0, coords, 0, 1);
         return new Point((int) coords[0], (int) coords[1]);
+    }
+
+
+    // Fuente: https://www.toolify.ai/es/ai-news-es/conversin-de-imagen-a-escala-de-grises-en-java-1162978 de referencia
+    private Image generarImagenNoStock(Image original){
+        if (original == null) {
+            return null;
+        }
+
+        // Se transforma a BufferedImage para poder acceder a getRGB
+        BufferedImage auxiliar = new BufferedImage(original.getWidth(null), original.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = (Graphics2D) auxiliar.getGraphics();
+        g2d.drawImage(original, 0, 0, null);
+        g2d.dispose();
+
+        // Se va cambiando pixel por pixel
+        for(int x = 0; x < auxiliar.getWidth(null); x++){
+            for(int y = 0; y < auxiliar.getHeight(null); y++){
+                int rgb = auxiliar.getRGB(x, y);
+                int alpha = (rgb >> 24) & 0xFF;
+                int r = (rgb >> 16) & 0xFF;
+                int g = (rgb >> 8) & 0xFF;
+                int b = rgb & 0xFF;
+                int promedio = (r + g + b) / 3;
+                int pixelGris = (alpha << 24) | (promedio << 16) | (promedio << 8) | promedio;
+                auxiliar.setRGB(x, y, pixelGris);
+            }
+        }
+
+        return auxiliar;
     }
 
     @Override
@@ -330,8 +378,13 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
     @Override
     public void mouseEntered(MouseEvent e) {
         if (panelExpendedor != null) {
-            panelExpendedor.setStock(true, "Stock disponible: 10 unidades", producto.getPrecio()); // Cambia el texto según el contexto de este botón
-            panelExpendedor.setImagenActual(imagen);
+            stockActual = this.panelExpendedor.verStockActual(producto.ordinal());
+            panelExpendedor.setStock(true, "Stock disponible: " + stockActual + " unidades", producto.getPrecio()); // Cambia el texto según el contexto de este botón
+            if(stockActual == 0){
+                panelExpendedor.setImagenActual(imagenNoStock);
+            } else {
+                panelExpendedor.setImagenActual(imagen);
+            }
         }
         if(!sonidoHoverYaReproducido){
             reproducirSonido(clipHover);
@@ -342,7 +395,9 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
     @Override
     public void mouseExited(MouseEvent e) {
         if (panelExpendedor != null) {
-            panelExpendedor.setStock(false, "", 0); // Deja de mostrar la barra
+            if(panelExpendedor.getUltimoClickeado() != this.producto.ordinal()) {
+                panelExpendedor.setStock(false, "", 0); // Deja de mostrar la barra
+            }
             panelExpendedor.setImagenActual(null);
         }
         sonidoHoverYaReproducido = false;

@@ -1,4 +1,4 @@
-package org.udec;
+package org.udec.visual;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +11,8 @@ public class PanelPrincipal extends JPanel {
     public PanelPrincipal(){
         this.setLayout(null);
         exp = new PanelExpendedor();
-        com = new PanelComprador();
+        com = new PanelComprador(exp);
+        exp.setPanelComprador(com);
         exp.setBounds(0,0,1200,900);
         com.setBounds(1200,0,400,900);
 

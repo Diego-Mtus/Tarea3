@@ -1,4 +1,4 @@
-package org.udec;
+package org.udec.visual;
 
 /*
  * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.

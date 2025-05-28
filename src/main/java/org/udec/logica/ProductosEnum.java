@@ -1,4 +1,4 @@
-package org.udec;
+package org.udec.logica;
 
 /**
  * Enumeración que representa los productos disponibles, que incluyen tanto bebidas como dulces.
