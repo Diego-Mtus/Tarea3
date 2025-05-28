@@ -1,9 +1,10 @@
-package org.udec;
+package org.udec.visual;
+
+import org.udec.logica.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -14,7 +15,11 @@ public class PanelExpendedor extends JPanel {
 
     private BotonRombo[] productos;
     private int[] precios;
-
+    private final int STOCK_BASE = 5;
+    private int[] stockDeCadaProducto;
+    private Expendedor expendedor;
+    private int ultimoClickeado = -1;
+    private PanelComprador panelComprador;
 
     private Font fuentePersonalizada;
     private Image imagenActual;
@@ -41,15 +46,23 @@ public class PanelExpendedor extends JPanel {
         productos = new BotonRombo[auxCantidad];
         precios = new int[auxCantidad];
 
+
         Image[] imagenesProductos = new Image[5];
         for (int i = 0; i < productos.length; i++) {
-            String nombreImagen = "/test" + (i % 5 + 1 ) + ".png";
+            String nombreImagen = "/" + (i % 5 + 1 ) + ".png";
             imagenesProductos[i] = new ImageIcon(getClass().getResource(nombreImagen)).getImage();
         }
+
         for(int i = 0; i < productos.length; i++){
             productos[i] = new BotonRombo(10, 10, 280, 60,  imagenesProductos[i], this, ProductosEnum.values()[i]);
             this.add(productos[i]);
             precios[i] = ProductosEnum.values()[i].getPrecio();
+        }
+
+        this.expendedor = new Expendedor(STOCK_BASE);
+        stockDeCadaProducto = new int[productos.length];
+        for(int i = 0; i < productos.length; i++){
+            stockDeCadaProducto[i] = STOCK_BASE;
         }
 
         try{
@@ -86,6 +99,25 @@ public class PanelExpendedor extends JPanel {
         repaint(600,20,600,600);
     }
 
+    public void usarExpendedor(Moneda m, ProductosEnum producto) throws NoHayProductoException, PagoInsuficienteException, PagoIncorrectoException {
+        this.expendedor.comprarProducto(m, producto);
+
+    }
+
+    public void setUltimoClickeado(int ultimoClickeado) {
+        this.ultimoClickeado = ultimoClickeado;
+    }
+
+    public int getUltimoClickeado() {
+        return ultimoClickeado;
+    }
+
+    public void notificarBoton(){
+        if (panelComprador != null){
+            panelComprador.actualizarBotonComprar();
+        }
+    }
+
     // Mét0do para que no se tenga que renderizar fondo a cada rato
     private void crearFondo(){
         fondo = new BufferedImage(1200, 900, BufferedImage.TYPE_INT_ARGB);
@@ -110,6 +142,19 @@ public class PanelExpendedor extends JPanel {
             this.textoPrecio = "$" + precio;
         }
         repaint(-20,500,400,280);
+    }
+
+    public int verStockActual(int producto){
+        return stockDeCadaProducto[producto];
+    }
+
+    public void reducirStock(int producto){
+        stockDeCadaProducto[producto]--;
+        repaint(-20,500,400,280);
+    }
+
+    public void setPanelComprador(PanelComprador panelComprador) {
+        this.panelComprador = panelComprador;
     }
 
     @Override
