@@ -104,6 +104,10 @@ public class PanelExpendedor extends JPanel {
 
     }
 
+    public void gestionVueltoExpendedor(int ultimoClickeado, Deposito<Moneda> deposito, Moneda monedaPago){
+        this.expendedor.procesarMonedas(ultimoClickeado, deposito, monedaPago);
+    }
+
     public void setUltimoClickeado(int ultimoClickeado) {
         this.ultimoClickeado = ultimoClickeado;
     }

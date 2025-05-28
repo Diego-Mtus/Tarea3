@@ -19,17 +19,21 @@ public class PanelPrincipal extends JPanel {
         this.add(exp);
         this.add(com);
 
-        fondo = new ImageIcon(getClass().getResource("/fondoMomentaneo.png")).getImage();
+        // Para no cargarlo multiples veces
+        fondo = new ImageIcon(getClass().getResource("/fondo.png")).getImage().getScaledInstance(1600,900,Image.SCALE_SMOOTH);
         JLabel fondoLabel = new JLabel(new ImageIcon(fondo));
         fondoLabel.setBounds(0,0,1600,900);
         this.add(fondoLabel);
-
 
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        if (fondo != null) {
+            g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
+        }
+
 
     }
 }

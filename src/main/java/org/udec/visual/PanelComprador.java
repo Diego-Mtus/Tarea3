@@ -7,6 +7,7 @@ import java.awt.*;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class PanelComprador extends JPanel {
 
@@ -14,7 +15,8 @@ public class PanelComprador extends JPanel {
     private JButton botonComprar;
     private PanelMonedas panelMonedas;
     private Producto ultimoProducctoComprado;
-
+    private JButton botonSaldo;
+    private Deposito<Moneda> depositoMonedasVuelto;
 
     public PanelComprador(PanelExpendedor panelExpendedor) {
         this.setPreferredSize(new Dimension(400, 900));
@@ -30,8 +32,9 @@ public class PanelComprador extends JPanel {
 
         // Funcionamiento de botón comprar
         botonComprar = new JButton("Elige un producto a comprar");
-        botonComprar.setPreferredSize(new Dimension(200, 100));
+        botonComprar.setPreferredSize(new Dimension(220, 100));
         botonComprar.setFocusable(false);
+        botonComprar.setEnabled(false);
         this.add(botonComprar);
         botonComprar.addActionListener(new ActionListener() {
             @Override
@@ -43,6 +46,7 @@ public class PanelComprador extends JPanel {
                             panelExpendedor.reducirStock(panelExpendedor.getUltimoClickeado());
                             System.out.println("Comprar " + ProductosEnum.values()[panelExpendedor.getUltimoClickeado()].getNombre());
                             JOptionPane.showMessageDialog(null, "¡Has comprado " + ProductosEnum.values()[panelExpendedor.getUltimoClickeado()].getNombre() + " exitosamente!", "Compra realizada", JOptionPane.INFORMATION_MESSAGE);
+                            panelExpendedor.gestionVueltoExpendedor(ProductosEnum.values()[panelExpendedor.getUltimoClickeado()].getPrecio(), depositoMonedasVuelto, panelMonedas.getMonedaSeleccionada());
 
                         } catch (NoHayProductoException ex) {
                             // Este catch no ocurrirá porque boton se desactiva cuando no hay producto.
@@ -60,6 +64,20 @@ public class PanelComprador extends JPanel {
             }
         });
 
+        // Boton de ver saldo
+        botonSaldo = new JButton("Retirar vuelto");
+        botonSaldo.setPreferredSize(new Dimension(100, 100));
+        botonSaldo.setFocusable(false);
+        this.depositoMonedasVuelto = new Deposito<>();
+        this.add(botonSaldo);
+        botonSaldo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                crearVentanaVuelto();
+            }
+        });
+
+        this.add(new BotonUsarProducto(300,340));
 
     }
 
@@ -71,6 +89,25 @@ public class PanelComprador extends JPanel {
         }
         botonComprar.setText("Comprar " + ProductosEnum.values()[panelExpendedor.getUltimoClickeado()].getNombre());
         botonComprar.setEnabled(panelExpendedor.verStockActual(panelExpendedor.getUltimoClickeado()) > 0);
+    }
+
+    private void recibirVuelto(JDialog ventana){
+        Moneda aux = depositoMonedasVuelto.get();
+        while(aux != null){
+            System.out.println(aux.toString());
+            ventana.add(new JLabel(aux.toString()));
+            aux = depositoMonedasVuelto.get();
+
+        }
+    }
+
+    private void crearVentanaVuelto(){
+        JDialog ventana = new JDialog((JFrame) SwingUtilities.getWindowAncestor(PanelComprador.this), "Vuelto", true);
+        ventana.setSize(500, 500);
+        ventana.setLocationRelativeTo(null);
+        ventana.setLayout(new GridLayout(10, 2));
+        recibirVuelto(ventana);
+        ventana.setVisible(true);
     }
 
     @Override

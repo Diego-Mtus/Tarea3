@@ -27,6 +27,7 @@ public class PanelMonedas extends JPanel {
         botonMoneda100.setPreferredSize(new Dimension(50, 50));
         botonMoneda100.setOpaque(true);
         botonMoneda100.setVisible(true);
+        botonMoneda100.setFocusable(false);
         botonMoneda100.setText("$100");
         this.add(botonMoneda100);
 
@@ -34,6 +35,7 @@ public class PanelMonedas extends JPanel {
         botonMoneda500.setPreferredSize(new Dimension(50, 50));
         botonMoneda500.setOpaque(true);
         botonMoneda500.setVisible(true);
+        botonMoneda500.setFocusable(false);
         botonMoneda500.setText("$500");
         this.add(botonMoneda500);
 
@@ -41,6 +43,7 @@ public class PanelMonedas extends JPanel {
         botonMoneda1000.setPreferredSize(new Dimension(50, 50));
         botonMoneda1000.setOpaque(true);
         botonMoneda1000.setVisible(true);
+        botonMoneda1000.setFocusable(false);
         botonMoneda1000.setText("$1000");
         this.add(botonMoneda1000);
 

@@ -105,7 +105,7 @@ public class Expendedor {
      * @param depositoMoneda Depósito de monedas donde se almacenaran monedas de 100.
      * @param m Moneda con la que se quiere pagar el producto.
      * */
-    private void procesarMonedas(int precioEnum, Deposito<Moneda> depositoMoneda, Moneda m){
+    public void procesarMonedas(int precioEnum, Deposito<Moneda> depositoMoneda, Moneda m){
         int auxPrecio = m.getValor() - precioEnum;
         while (auxPrecio > 0) {
             depositoMoneda.add(new Moneda100());
