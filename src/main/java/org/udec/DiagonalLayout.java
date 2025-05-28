@@ -146,7 +146,7 @@ public class DiagonalLayout implements LayoutManager {
                 - (insets.top + insets.bottom);
         int nComps = parent.getComponentCount();
         int previousWidth = 0, previousHeight = 0;
-        int x = 0, y = insets.top;
+        int x = insets.left, y = insets.top;
         int rowh = 0, start = 0;
         int xFudge = 0, yFudge = 0;
         boolean oneColumn = false;

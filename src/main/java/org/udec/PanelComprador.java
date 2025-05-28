@@ -6,9 +6,8 @@ import java.awt.*;
 public class PanelComprador extends JPanel {
 
     public PanelComprador(){
-
-        this.setPreferredSize(new Dimension(300, 500));
-        this.setBackground(new Color(255, 229, 44));
+        this.setPreferredSize(new Dimension(400, 900));
+        this.setOpaque(false);
     }
 
     @Override

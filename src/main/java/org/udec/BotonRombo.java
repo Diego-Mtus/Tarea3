@@ -29,9 +29,15 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
     int[][] esquinasRect;
     int diametroCirculo = 6;
 
+    // Variables manejo imagen
+    private Image imagen;
+    private PanelExpendedor panelExpendedor;
+
+
     // Variables del texto
     private final String texto;
     private Font fuentePersonalizada;
+    private ProductosEnum producto;
 
     // Variables para sonido
     private boolean sonidoHoverYaReproducido = false;
@@ -53,8 +59,12 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
 
     // Valores que nos gustaron: ancho 280 y alto 60.
 
-    public BotonRombo(int x, int y, int ancho, int alto, String texto) {
+    public BotonRombo(int x, int y, int ancho, int alto, Image imagen, PanelExpendedor panelExpendedor, ProductosEnum producto) {
+        this.panelExpendedor = panelExpendedor;
+        this.imagen = imagen;
+        this.producto = producto;
 
+        this.setOpaque(false);
         // Crear un rectangulo rotado
         Shape cuadrado_base = new Rectangle(x, y, ancho, alto);
 
@@ -66,6 +76,7 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
         this.rectanguloArea = new Area(figura);
         this.mouseEnFigura = false;
         this.colorTexto = colorHover;
+
 
         // Esquinas son para hacer circulos en las esquinas como si fueran perforaciones
         // Ya que el rectangulo está rotado 1.5 grados, hay que corregir las coordenadas de los bordes de acuerdo a eso.
@@ -118,7 +129,7 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
         this.setPreferredSize(ajusteDimension);
         this.setMinimumSize(ajusteDimension);
 
-        this.texto = texto;
+        this.texto = producto.getNombre();
         // Cargar la fuente personalizada
         try {
             // Ruta hacia el archivo .otf (en la carpeta resources)
@@ -202,6 +213,7 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
             System.out.println("Figura clickeada");
             inicioTransicionColor();
             reproducirSonido(clipClick);
+
         }
     }
 
@@ -219,20 +231,15 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
             colorTexto = colorNormal;
             if (!mouseEnFigura) {
                 mouseEnFigura = true;
+                repaint(getVisibleRect().x, getVisibleRect().y, getVisibleRect().width, getVisibleRect().height);
             }
-            repaint();
-            // Reproducción de sonido de hover
-            if(!sonidoHoverYaReproducido){
-                reproducirSonido(clipHover);
-                sonidoHoverYaReproducido = true;
-            }
+
         } else {
             colorTexto = colorHover;
             if (mouseEnFigura) {
                 mouseEnFigura = false;
+                repaint(getVisibleRect().x, getVisibleRect().y, getVisibleRect().width, getVisibleRect().height);
             }
-            sonidoHoverYaReproducido = false;
-            repaint();
         }
     }
 
@@ -263,13 +270,13 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
 
             colorActual = new Color(r, g, b);
 
-            repaint();
+            repaint(getVisibleRect().x, getVisibleRect().y, getVisibleRect().width, getVisibleRect().height);
 
             pasoActual++;
             if (pasoActual >= pasos) {
                 timer.stop();
                 colorActual = colorClick;
-                repaint();
+                repaint(getVisibleRect().x, getVisibleRect().y, getVisibleRect().width, getVisibleRect().height);
                 inicioTransicionColorRegreso();
 
             }
@@ -293,13 +300,13 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
             int b = (int) (colorClick.getBlue() + t * (colorHover.getBlue() - colorClick.getBlue()));
 
             colorActual = new Color(r, g, b);
-            repaint();
+            repaint(getVisibleRect().x, getVisibleRect().y, getVisibleRect().width, getVisibleRect().height);
 
             pasoActual++;
             if(pasoActual >= pasos) {
                 timerVuelta.stop();
                 colorActual = colorHover;
-                repaint();
+                repaint(getVisibleRect().x, getVisibleRect().y, getVisibleRect().width, getVisibleRect().height);
             }
 
         });
@@ -322,10 +329,23 @@ public class BotonRombo extends JPanel implements MouseListener, MouseMotionList
 
     @Override
     public void mouseEntered(MouseEvent e) {
+        if (panelExpendedor != null) {
+            panelExpendedor.setStock(true, "Stock disponible: 10 unidades", producto.getPrecio()); // Cambia el texto según el contexto de este botón
+            panelExpendedor.setImagenActual(imagen);
+        }
+        if(!sonidoHoverYaReproducido){
+            reproducirSonido(clipHover);
+            sonidoHoverYaReproducido = true;
+        }
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+        if (panelExpendedor != null) {
+            panelExpendedor.setStock(false, "", 0); // Deja de mostrar la barra
+            panelExpendedor.setImagenActual(null);
+        }
+        sonidoHoverYaReproducido = false;
     }
 
 }
