@@ -7,7 +7,7 @@ import javax.swing.*;
 public class Main {
     public static void main(String[] args) {
 
-        JFrame test = new JFrame("pruebaaa");
+        JFrame test = new JFrame("Expendedor de productos");
         test.setSize(1600, 900);
         test.setResizable(false);
         test.setLocationRelativeTo(null);

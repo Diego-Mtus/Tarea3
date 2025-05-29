@@ -6,7 +6,6 @@ public abstract class Producto {
     /** Almacena el número de serie de un producto. Simula un identificador único.*/
     private int serie;
 
-
     /** Constructor que inicializa número de serie.
      * @param serie Número de serie deseado para producto. */
     public Producto(int serie) {

@@ -99,9 +99,8 @@ public class PanelExpendedor extends JPanel {
         repaint(600,20,600,600);
     }
 
-    public void usarExpendedor(Moneda m, ProductosEnum producto) throws NoHayProductoException, PagoInsuficienteException, PagoIncorrectoException {
-        this.expendedor.comprarProducto(m, producto);
-
+    public Producto usarExpendedor(Moneda m, ProductosEnum productoEnum) throws NoHayProductoException, PagoInsuficienteException, PagoIncorrectoException {
+       return this.expendedor.comprarProducto(m, productoEnum);
     }
 
     public void gestionVueltoExpendedor(int ultimoClickeado, Deposito<Moneda> deposito, Moneda monedaPago){
